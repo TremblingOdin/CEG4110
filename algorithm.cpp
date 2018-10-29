@@ -59,11 +59,11 @@ class Hider {
 		dataSize = sizeof(binary);
 
 		personalData = pD;
-		binaryData = encryptToBinary(encryption);
+		encryptToBinary(encryption);
 	}
 	
 	//When given a char array convert it into binary to hide data
-	char[] encryptToBinary(char * data) {
+	void encryptToBinary(char * data) {
 		//Small 9 characters buffer
 		char output[9];
 
