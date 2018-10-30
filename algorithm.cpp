@@ -20,9 +20,9 @@ class Hider {
 	long long varNumb;
 
 	vector<char> binaryData;
+	
 	//Only accepting First Name, Last Name, Birthday, Social Security, Address, Primary Car Physician, Medical History
-	//Medical History is limited to 500 characters
-	char personalData [7] [500];
+	std::string personalData [7];
 
 	//Prototypes
 	vector<char> encryptToBinary(char*);
@@ -39,7 +39,7 @@ class Hider {
 	}
 
 	//Constructor to accept binary data alongside personal data
-	Hider(const char binary[], char pD[][]) {
+	Hider(const std::string binary, std::string pD[]) {
 		//Set up time and other variables
 		time_t tt;
 		systime = * localtime(&tt);
@@ -47,20 +47,21 @@ class Hider {
 		dataSize = sizeof(binary);
 
 		personalData = pD;
-		binaryData = binary[];
+		binaryData = binary;
 		
 	}
 
 	//If given non-binary data
-	Hider(const char encryption[], char pD[][]) {
+	Hider(const char * encryption, std::string pd[]) {
 		//Set up time and other variables
 		time_t tt;
 		systime = * localtime(&tt);
 		varNumb = 7;
-		dataSize = sizeof(binary);
 
 		personalData = pD;
 		encryptToBinary(encryption);
+
+		dataSize = sizeof(binaryData);
 	}
 	
 	//When given a char array convert it into binary to hide data
@@ -76,16 +77,58 @@ class Hider {
 
 	//Hide the data within the binary and return it all
 	char[] hide() {
-		
+		//@ indicates end of a thing of info
+		binaryData.insert(binaryData.begin(), to_string(systime) + "@" + to_string(dataSize) + "@");
+
+		for(int	i = 0; i < varNumb; i++) {
+			//Rudimentary algorithm
+			binaryData.insert((((systime % 10) + i) * (systime%33))/2 + (dataSize/((systime%3)+5)), personalData[i]+ "@");
+		}
 	}
 
 	//Discover the data within the binary, assign it to the variables so they may be called with getter methods
 	void find() {
+		std::string systimeString = "";
+		std::string dataSizeString = "";
+
+		long long location = 0;		
+
+		while(binaryData.at(binaryData.begin())!="@"||binaryData.at(binaryData.begin())!=NULL) {
+			systimeString += binaryData.at(location);
+			binaryData.erase(binaryData.begin());
+		}
+		binaryData.erase(binaryData.begin());
 		
+		if(binaryData.at(location) == NULL) {
+			throw("Improperly formatted or no data");
+		}
+
+		systime = std::stoll(systimeString);
+
+		while(binaryData.at(binaryData.begin())!="@"||binaryData.at(binaryData.begin())!=Null) {
+			dataSizeString += binaryData.at(location);
+			binaryData.erase(binaryData.begin());
+		}
+		binaryData.erase(binaryData.begin());
+
+		if(binaryData.at(location) == NULL) {
+			throw("Improperly formatted or no data");
+		}
+
+		dataSize = std::stoll(dataSizeString);
+
+		for(int i = 0; i < varNumb; i++) {
+			location = ((systime%10)+i*(systime%33))/2 + (datasize/((systime%3)+1));
+			while(binaryData.at(location)!="@"||binaryData.at(location)!=NULL){
+				personalData[i] += binaryData.at(location);
+				binaryData.erase(location);
+			}
+			binaryData.erase(location);
+		}
 	}
 
 	//Return the personal data
-	char[][] getPD() {
+	std::string[] getPD() {
 		return personalData;
 	}
 
