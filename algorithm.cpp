@@ -2,11 +2,12 @@
  * This file reads in a binary input or converts sent info to binary then randomly hides provided data inside the binary
  * author: Kayvan Ehteshami
  *
- * Mersenne Twister is the basis for the hiding algorithm
  */
 
-#include <iostream>
+#include <bitset>
 #include <ctime>
+#include <iostream>
+#include <sstream>
 #include <vector>
 
 using namespace std;
@@ -91,5 +92,22 @@ class Hider {
 	//Return the binary data that originally hid the personal data
 	vector<char> getBinary() {
 		return binaryData;
+	}
+
+	//Return the original non-binary data
+	vector<char> getNonBinaryData() {
+		//Cpp has so many useful data libraries
+		std::stringstream sstream(binaryData);
+		std::string nonBinaryData;
+
+		
+		while(sstream.good()){
+			std::bitset<8> bits;
+			sstream >> bits;
+			char c = char(bits.to_ulong());
+			nonBinaryData += c;
+		}
+		
+		return nonBinaryData;
 	}
 }
