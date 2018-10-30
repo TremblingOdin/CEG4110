@@ -50,7 +50,7 @@ class Hider {
 		
 	}
 
-	//if given non-binary data
+	//If given non-binary data
 	Hider(const char encryption[], char pD[][]) {
 		//Set up time and other variables
 		time_t tt;
@@ -71,5 +71,25 @@ class Hider {
 		while(*data) {
 			binaryData.push_back(itoa(*data, output,2); 
 		}
+	}
+
+	//Hide the data within the binary and return it all
+	char[] hide() {
+		
+	}
+
+	//Discover the data within the binary, assign it to the variables so they may be called with getter methods
+	void find() {
+		
+	}
+
+	//Return the personal data
+	char[][] getPD() {
+		return personalData;
+	}
+
+	//Return the binary data that originally hid the personal data
+	vector<char> getBinary() {
+		return binaryData;
 	}
 }
