@@ -1,6 +1,6 @@
 /*
  * This file reads in a binary input or converts sent info to binary then randomly hides provided data inside the binary
- * author: Kayvan Ehteshami
+ * author: Kayvan Ehteshami, Nathan Schroer
  *
  */
 
@@ -26,9 +26,9 @@ class Hider {
 
 	//Prototypes
 	vector<char> encryptToBinary(char*);
-	char[] hide();
+	vector<char> hide();
 	void find();
-	std::string[] getPD();
+	vector<std::string> getPD();
 	vector<char> getBinary();
 	vector<char> getNonBinaryData();
 
@@ -57,7 +57,7 @@ class Hider {
 	}
 
 	//If given non-binary data
-	Hider(const char * encryption, std::string pd[]) {
+	Hider(const char * encryption, std::string pD[]) {
 		//Set up time and other variables
 		time_t tt;
 		systime = * localtime(&tt);
@@ -76,12 +76,12 @@ class Hider {
 
 		//Until the first character pointed by s is not a null character
 		while(*data) {
-			binaryData.push_back(itoa(*data, output,2); 
+			binaryData.push_back(itoa(*data, output,2)); 
 		}
 	}
 
 	//Hide the data within the binary and return it all
-	char[] hide() {
+	vector<char> hide() {
 		//@ indicates end of a thing of info
 		binaryData.insert(binaryData.begin(), to_string(systime) + "@" + to_string(dataSize) + "@");
 
@@ -123,7 +123,7 @@ class Hider {
 		dataSize = std::stoll(dataSizeString);
 
 		for(int i = 0; i < varNumb; i++) {
-			location = ((systime%10)+i*(systime%33))/2 + (datasize/((systime%3)+1));
+			location = ((systime%10)+i*(systime%33))/2 + (dataSize/((systime%3)+1));
 			while(binaryData.at(location)!="@"||binaryData.at(location)!=NULL){
 				personalData[i] += binaryData.at(location);
 				binaryData.erase(location);
@@ -133,7 +133,7 @@ class Hider {
 	}
 
 	//Return the personal data
-	std::string[] getPD() {
+	vector<std::string> getPD() {
 		return personalData;
 	}
 
@@ -158,4 +158,4 @@ class Hider {
 		
 		return nonBinaryData;
 	}
-}
+};
