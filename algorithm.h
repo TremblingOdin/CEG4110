@@ -26,11 +26,6 @@ class Hider {
 
 	//Prototypes
 	vector<char> encryptToBinary(char*);
-	char[] hide();
-	void find();
-	std::string[] getPD();
-	vector<char> getBinary();
-	vector<char> getNonBinaryData();
 
 	//Empty Constructor just incase
 	Hider() {
