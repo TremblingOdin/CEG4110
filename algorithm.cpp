@@ -1,6 +1,6 @@
 /*
  * This file reads in a binary input or converts sent info to binary then randomly hides provided data inside the binary
- * author: Kayvan Ehteshami, Nathan Schroer
+ * author: Kayvan Ehteshami
  *
  */
 
