@@ -8,6 +8,7 @@
 #include "algorithm.h"
 #include <bitset>
 #include <ctime>
+#include <chrono>
 #include <cstring>
 #include <iostream>
 #include <sstream>
@@ -17,8 +18,8 @@ using namespace std;
 
 Algorithm::Algorithm() {
 	//Set up time and other variables
-	tm * tt;
-	systime = mktime(tt);
+	__int64 now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	systime = now;
 	dataSize = 0;
 	varNumb = 7;
 }
@@ -26,8 +27,9 @@ Algorithm::Algorithm() {
 //Constructor to accept binary data alongside personal data
 Algorithm::Algorithm(const std::string binary, std::vector<std::string> pd) {
 	//Set up time and other variables
-	tm * tt;
-	systime = mktime(tt);
+	//turns out int64 is just fancy long
+	__int64 now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	systime = now;
 	varNumb = 7;
 	dataSize = sizeof(binary);
 
@@ -43,8 +45,8 @@ Algorithm::Algorithm(const std::string binary, std::vector<std::string> pd) {
 //If given non-binary data
 Algorithm::Algorithm(char * encryption, std::vector<std::string> pd) {
 	//Set up time and other variables
-	tm * tt;
-	systime = mktime(tt);
+	__int64 now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	systime = now;
 	varNumb = 7;
 
 	personalData = pd;
