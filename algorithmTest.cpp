@@ -10,7 +10,15 @@
 using namespace std;
 
 int main() {
-	std::vector<std::string> pd = { "Jane", "Doe", "4/7/1776", "420696969", "123 Fake Street", "Dr. Acula", "Hemochromatosis, Gaut, Alzheimers' Disorder, Glass Bones Disorder, Paper Skin Disorder, Addicted to Mr. Brightside, Tumblrculosis, Candidiasis Hypersensitivity, Radiiluciussensibilitatem, Situational Depression, Situational Mania, Gluten Allergy" };
+	PersonalData *pd;
+	pd->address = "1234 fake street";
+	pd->birthday = "12/12/1212";
+	pd->first_name = "Jane";
+	pd->last_name = "Doe";
+	pd->med_history = "Death, lyme disease, glutten allergy";
+	pd->pcp = "Dr. Mantis Tobagin";
+	pd->social_security = "555-55-5555";
+
 	std::string binary = "01010101010111111111111111000010101010100000";
 
 	Algorithm algie(binary, pd);

@@ -25,9 +25,8 @@ Algorithm::Algorithm() {
 }
 
 //Constructor to accept binary data alongside personal data
-Algorithm::Algorithm(const std::string binary, std::vector<std::string> pd) {
+Algorithm::Algorithm(std::string binary, PersonalData *pd) {
 	//Set up time and other variables
-	//turns out int64 is just fancy long
 	__int64 now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	systime = now;
 	varNumb = 7;
@@ -37,62 +36,66 @@ Algorithm::Algorithm(const std::string binary, std::vector<std::string> pd) {
 
 	//Binary.size() returns unsigned
 	for (unsigned i = 0; i < binary.size(); i++) {
-		binaryData.push_back((char)binary[i]);
+		binaryData = binary;
 	}
 
-}
-
-//If given non-binary data
-Algorithm::Algorithm(char * encryption, std::vector<std::string> pd) {
-	//Set up time and other variables
-	__int64 now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-	systime = now;
-	varNumb = 7;
-
-	personalData = pd;
-
-	encryptToBinary(encryption);
-
-	dataSize = sizeof(binaryData);
-}
-
-//When given a char array convert it into binary to hide data
-void Algorithm::encryptToBinary(char* data) {
-	std::string bitString;
-	char bitGroup[8];
-
-	//Until the first character pointed by s is not a null character
-	while (*data) {
-		bitString = std::bitset<8>(*data).to_string();
-			
-		strcpy_s(bitGroup, bitString.c_str());
-
-		for (int j = 0; j < 8; j++) {
-			binaryData.emplace_back(bitGroup[j]);
-		}
-	}
 }
 
 //Hide the data within the binary and return it all
-vector<char> Algorithm::hide() {
-	std::vector<char>::iterator location;
+string Algorithm::hide() {
+	size_t location = 0;
 
 	//Char pointer creator
-	const char * binaryPointer = (to_string(systime) + '@' + to_string(dataSize) + '@').c_str();
-	location = binaryData.begin();
+	std::string binaryPointer = (to_string(systime) + '@' + to_string(dataSize) + '@').c_str();
 	//@ indicates end of a thing of info
-	while (binaryPointer != NULL) {
-		binaryData.insert(location, *binaryPointer);
+	
+	while (!binaryPointer.empty()) {
+		binaryData.insert(location, binaryPointer);
 	}
 
-	for (int i = 0; i < varNumb; i++) {
-		binaryPointer = (personalData[i] + '@').c_str();
+	binaryPointer = (personalData->address + '@').c_str();
 
-		long place = (((systime % 10) + i) * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 5));
+    int place = static_cast<int>((((systime % 10) + 1) * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 5)));
 
-		//Rudimentary algorithm
-		binaryData.insert(location + place, *binaryPointer);
-	}
+	//Rudimentary algorithm
+	binaryData.insert(location + place, binaryPointer);
+
+	binaryPointer = (personalData->birthday + '@').c_str();
+
+	place = static_cast<int>((((systime % 10) + 2) * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 5)));
+
+	binaryData.insert(location + place, binaryPointer);
+
+	binaryPointer = (personalData->first_name + '@').c_str();
+
+	place = static_cast<int>((((systime % 10) + 3) * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 5)));
+
+	binaryData.insert(location + place, binaryPointer);
+
+	binaryPointer = (personalData->last_name + '@').c_str();
+
+	place = static_cast<int>((((systime % 10) + 4) * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 5)));
+
+	binaryData.insert(location + place, binaryPointer);
+
+	binaryPointer = (personalData->med_history + '@').c_str();
+
+	place = static_cast<int>((((systime % 10) + 5) * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 5)));
+
+	binaryData.insert(location + place, binaryPointer);
+
+	binaryPointer = (personalData->pcp + '@').c_str();
+
+	place = static_cast<int>((((systime % 10) + 6) * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 5)));
+
+	binaryData.insert(location + place, binaryPointer);
+
+	binaryPointer = (personalData->social_security + '@').c_str();
+
+	place = static_cast<int>((((systime % 10) + 7) * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 5)));
+
+	binaryData.insert(location + place, binaryPointer);
+
 
 	return binaryData;
 }
@@ -102,70 +105,91 @@ void Algorithm::find() {
 	std::string systimeString = "";
 	std::string dataSizeString = "";
 
-	std::vector<char>::iterator location;
-	location = binaryData.begin();
+	size_t location = 0;
 
-	while (binaryData.at(*location) != '@' || binaryData.at(*location) != NULL) {
-		systimeString += binaryData.at(*location);
+	while (binaryData.at(location) != '@' || binaryData.at(location) != NULL) {
+		systimeString += binaryData.at(location);
 		binaryData.erase(location);
 	}
 	binaryData.erase(location);
 
-	if (binaryData.at(*location) == NULL) {
+	if (binaryData.at(location) == NULL) {
 		throw("Improperly formatted or no data");
 	}
 
 	systime = std::stoll(systimeString);
 
-	while (binaryData.at(*location) != '@' || binaryData.at(*location) != NULL) {
-		dataSizeString += binaryData.at(*location);
+	while (binaryData.at(location) != '@' || binaryData.at(location) != NULL) {
+		dataSizeString += binaryData.at(location);
 		binaryData.erase(location);
 	}
 	binaryData.erase(binaryData.begin());
 
-	if (binaryData.at(*location) == NULL) {
+	if (binaryData.at(location) == NULL) {
 		throw("Improperly formatted or no data");
 	}
 
 	dataSize = std::stoll(dataSizeString);
 
-	for (int i = 0; i < varNumb; i++) {
-		long place = ((systime % 10) + i * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 1));
-		while (binaryData.at(*location + place) != '@' || binaryData.at(*location + place) != NULL) {
-			personalData[i] += binaryData.at(*location + place);
-			binaryData.erase(location + place);
-		}
+	int place = static_cast<int>(((systime % 10) + 7 * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 1)));
+	while (binaryData.at(location + place) != '@' || binaryData.at(location + place) != NULL) {
+		personalData->social_security += binaryData.at(location + place);
 		binaryData.erase(location + place);
 	}
+	binaryData.erase(location + place);
+	
+	place = static_cast<int>(((systime % 10) + 6 * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 1)));
+	while (binaryData.at(location + place) != '@' || binaryData.at(location + place) != NULL) {
+		personalData->pcp += binaryData.at(location + place);
+		binaryData.erase(location + place);
+	}
+	binaryData.erase(location + place);
+
+	place = static_cast<int>(((systime % 10) + 5 * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 1)));
+	while (binaryData.at(location + place) != '@' || binaryData.at(location + place) != NULL) {
+		personalData->med_history += binaryData.at(location + place);
+		binaryData.erase(location + place);
+	}
+	binaryData.erase(location + place);
+
+	place = static_cast<int>(((systime % 10) + 4 * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 1)));
+	while (binaryData.at(location + place) != '@' || binaryData.at(location + place) != NULL) {
+		personalData->last_name += binaryData.at(location + place);
+		binaryData.erase(location + place);
+	}
+	binaryData.erase(location + place);
+
+	place = static_cast<int>(((systime % 10) + 3 * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 1)));
+	while (binaryData.at(location + place) != '@' || binaryData.at(location + place) != NULL) {
+		personalData->first_name += binaryData.at(location + place);
+		binaryData.erase(location + place);
+	}
+	binaryData.erase(location + place);
+
+	place = static_cast<int>(((systime % 10) + 2 * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 1)));
+	while (binaryData.at(location + place) != '@' || binaryData.at(location + place) != NULL) {
+		personalData->birthday += binaryData.at(location + place);
+		binaryData.erase(location + place);
+	}
+	binaryData.erase(location + place);
+
+	place = static_cast<int>(((systime % 10) + 1 * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 1)));
+	while (binaryData.at(location + place) != '@' || binaryData.at(location + place) != NULL) {
+		personalData->address += binaryData.at(location + place);
+		binaryData.erase(location + place);
+	}
+	binaryData.erase(location + place);
+
 }
 
 //Return the personal data
-std::vector<std::string> Algorithm::getPD() {
-	std::vector<std::string> pdp = personalData;
+PersonalData* Algorithm::getPD() {
+	PersonalData *pdp = personalData;
 
 	return pdp;
 }
 
 //Return the binary data that originally hid the personal data
-vector<char> Algorithm::getBinary() {
+std::string Algorithm::getBinary() {
 	return binaryData;
 }
-
-//Return the original non-binary data
-vector<char> Algorithm::getNonBinaryData() {
-	std::string binaryString(binaryData.begin(), binaryData.end());
-	//Cpp has so many useful data libraries
-	std::stringstream sstream(binaryString);
-	vector<char> nonBinaryData;
-
-
-	while (sstream.good()) {
-		std::bitset<8> bits;
-		sstream >> bits;
-		char c = char(bits.to_ulong());
-		nonBinaryData.emplace_back(c);
-	}
-
-	return nonBinaryData;
-}
-
