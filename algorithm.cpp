@@ -5,6 +5,7 @@
 */
 
 #include "stdafx.h"
+#include "algorithm.h"
 #include <bitset>
 #include <ctime>
 #include <cstring>
@@ -14,172 +15,155 @@
 
 using namespace std;
 
-class Algorithm {
+Algorithm::Algorithm() {
+	//Set up time and other variables
+	tm * tt;
+	systime = mktime(tt);
+	dataSize = 0;
+	varNumb = 7;
+}
 
-public:
-	//long is the largest number related data type
-	//No clue how large these will be so need largest possible
-	long systime;
-	long dataSize;
-	long varNumb;
+//Constructor to accept binary data alongside personal data
+Algorithm::Algorithm(const std::string binary, std::vector<std::string> pd) {
+	//Set up time and other variables
+	tm * tt;
+	systime = mktime(tt);
+	varNumb = 7;
+	dataSize = sizeof(binary);
 
-	vector<char> binaryData;
+	personalData = pd;
 
-	//Only accepting First Name, Last Name, Birthday, Social Security, Address, Primary Car Physician, Medical History
-	std::string personalData[7] = { "" };
-
-	//Empty Constructor just incase
-	Algorithm() {
-		//Set up time and other variables
-		tm * tt;
-		systime = mktime(tt);
-		dataSize = 0;
-		varNumb = 7;
+	//Binary.size() returns unsigned
+	for (unsigned i = 0; i < binary.size(); i++) {
+		binaryData.push_back((char)binary[i]);
 	}
 
-	//Constructor to accept binary data alongside personal data
-	Algorithm(const std::string binary, std::string pD[]) {
-		//Set up time and other variables
-		tm * tt;
-		systime = mktime(tt);
-		varNumb = 7;
-		dataSize = sizeof(binary);
+}
 
-		for (int i = 0; i < 7; i++) {
-			personalData[i] = pD[i];
-		}
+//If given non-binary data
+Algorithm::Algorithm(char * encryption, std::vector<std::string> pd) {
+	//Set up time and other variables
+	tm * tt;
+	systime = mktime(tt);
+	varNumb = 7;
 
-		//Binary.size() returns unsigned
-		for (unsigned i = 0; i < binary.size(); i++) {
-			binaryData.push_back((char)binary[i]);
-		}
+	personalData = pd;
 
-	}
+	encryptToBinary(encryption);
 
-	//If given non-binary data
-	Algorithm(const char * encryption, std::string pD[]) {
-		//Set up time and other variables
-		tm * tt;
-		systime = mktime(tt);
-		varNumb = 7;
+	dataSize = sizeof(binaryData);
+}
 
-		for (int i = 0; i < 7; i++) {
-			personalData[i] = pD[i];
-		}
+//When given a char array convert it into binary to hide data
+void Algorithm::encryptToBinary(char* data) {
+	std::string bitString;
+	char bitGroup[8];
 
-		encryptToBinary(encryption);
-
-		dataSize = sizeof(binaryData);
-	}
-
-	//When given a char array convert it into binary to hide data
-	vector<char> encryptToBinary(const char * data) {
-		std::string bitString;
-		char bitGroup[8];
-
-		//Until the first character pointed by s is not a null character
-		while (*data) {
-			bitString = std::bitset<8>(*data).to_string();
+	//Until the first character pointed by s is not a null character
+	while (*data) {
+		bitString = std::bitset<8>(*data).to_string();
 			
-			strcpy_s(bitGroup, bitString.c_str());
+		strcpy_s(bitGroup, bitString.c_str());
 
-			for (int j = 0; j < 8; j++) {
-				binaryData.emplace_back(bitGroup[j]);
-			}
+		for (int j = 0; j < 8; j++) {
+			binaryData.emplace_back(bitGroup[j]);
 		}
 	}
+}
 
-	//Hide the data within the binary and return it all
-	vector<char> hide() {
-		std::vector<char>::iterator location;
+//Hide the data within the binary and return it all
+vector<char> Algorithm::hide() {
+	std::vector<char>::iterator location;
 
-		//Char pointer creator
-		const char * binaryPointer = (to_string(systime) + '@' + to_string(dataSize) + '@').c_str();
-		location = binaryData.begin();
-		//@ indicates end of a thing of info
-		while (binaryPointer != NULL) {
-			binaryData.insert(location, *binaryPointer);
-		}
-
-		for (int i = 0; i < varNumb; i++) {
-			binaryPointer = (personalData[i] + '@').c_str();
-
-			long place = (((systime % 10) + i) * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 5));
-
-			//Rudimentary algorithm
-			binaryData.insert(location + place, *binaryPointer);
-		}
+	//Char pointer creator
+	const char * binaryPointer = (to_string(systime) + '@' + to_string(dataSize) + '@').c_str();
+	location = binaryData.begin();
+	//@ indicates end of a thing of info
+	while (binaryPointer != NULL) {
+		binaryData.insert(location, *binaryPointer);
 	}
 
-	//Discover the data within the binary, assign it to the variables so they may be called with getter methods
-	void find() {
-		std::string systimeString = "";
-		std::string dataSizeString = "";
+	for (int i = 0; i < varNumb; i++) {
+		binaryPointer = (personalData[i] + '@').c_str();
 
-		std::vector<char>::iterator location;
-		location = binaryData.begin();
+		long place = (((systime % 10) + i) * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 5));
 
-		while (binaryData.at(*location) != '@' || binaryData.at(*location) != NULL) {
-			systimeString += binaryData.at(*location);
-			binaryData.erase(location);
-		}
+		//Rudimentary algorithm
+		binaryData.insert(location + place, *binaryPointer);
+	}
+
+	return binaryData;
+}
+
+//Discover the data within the binary, assign it to the variables so they may be called with getter methods
+void Algorithm::find() {
+	std::string systimeString = "";
+	std::string dataSizeString = "";
+
+	std::vector<char>::iterator location;
+	location = binaryData.begin();
+
+	while (binaryData.at(*location) != '@' || binaryData.at(*location) != NULL) {
+		systimeString += binaryData.at(*location);
 		binaryData.erase(location);
+	}
+	binaryData.erase(location);
 
-		if (binaryData.at(*location) == NULL) {
-			throw("Improperly formatted or no data");
-		}
+	if (binaryData.at(*location) == NULL) {
+		throw("Improperly formatted or no data");
+	}
 
-		systime = std::stoll(systimeString);
+	systime = std::stoll(systimeString);
 
-		while (binaryData.at(*location) != '@' || binaryData.at(*location) != NULL) {
-			dataSizeString += binaryData.at(*location);
-			binaryData.erase(location);
-		}
-		binaryData.erase(binaryData.begin());
+	while (binaryData.at(*location) != '@' || binaryData.at(*location) != NULL) {
+		dataSizeString += binaryData.at(*location);
+		binaryData.erase(location);
+	}
+	binaryData.erase(binaryData.begin());
 
-		if (binaryData.at(*location) == NULL) {
-			throw("Improperly formatted or no data");
-		}
+	if (binaryData.at(*location) == NULL) {
+		throw("Improperly formatted or no data");
+	}
 
-		dataSize = std::stoll(dataSizeString);
+	dataSize = std::stoll(dataSizeString);
 
-		for (int i = 0; i < varNumb; i++) {
-			long place = ((systime % 10) + i * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 1));
-			while (binaryData.at(*location + place) != '@' || binaryData.at(*location + place) != NULL) {
-				personalData[i] += binaryData.at(*location + place);
-				binaryData.erase(location + place);
-			}
+	for (int i = 0; i < varNumb; i++) {
+		long place = ((systime % 10) + i * (systime % 33)) / 2 + (dataSize / ((systime % 3) + 1));
+		while (binaryData.at(*location + place) != '@' || binaryData.at(*location + place) != NULL) {
+			personalData[i] += binaryData.at(*location + place);
 			binaryData.erase(location + place);
 		}
+		binaryData.erase(location + place);
+	}
+}
+
+//Return the personal data
+std::vector<std::string> Algorithm::getPD() {
+	std::vector<std::string> pdp = personalData;
+
+	return pdp;
+}
+
+//Return the binary data that originally hid the personal data
+vector<char> Algorithm::getBinary() {
+	return binaryData;
+}
+
+//Return the original non-binary data
+vector<char> Algorithm::getNonBinaryData() {
+	std::string binaryString(binaryData.begin(), binaryData.end());
+	//Cpp has so many useful data libraries
+	std::stringstream sstream(binaryString);
+	vector<char> nonBinaryData;
+
+
+	while (sstream.good()) {
+		std::bitset<8> bits;
+		sstream >> bits;
+		char c = char(bits.to_ulong());
+		nonBinaryData.emplace_back(c);
 	}
 
-	//Return the personal data
-	std::string* getPD() {
-		std::string* pdp = personalData;
+	return nonBinaryData;
+}
 
-		return pdp;
-	}
-
-	//Return the binary data that originally hid the personal data
-	vector<char> getBinary() {
-		return binaryData;
-	}
-
-	//Return the original non-binary data
-	vector<char> getNonBinaryData() {
-		std::string binaryString(binaryData.begin(), binaryData.end());
-		//Cpp has so many useful data libraries
-		std::stringstream sstream(binaryString);
-		vector<char> nonBinaryData;
-
-
-		while (sstream.good()) {
-			std::bitset<8> bits;
-			sstream >> bits;
-			char c = char(bits.to_ulong());
-			nonBinaryData.emplace_back(c);
-		}
-
-		return nonBinaryData;
-	}
-};
