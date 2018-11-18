@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "algorithm.h"
 #include <bitset>
 #include <ctime>
@@ -22,4 +21,17 @@ int main() {
 	std::string binary = "01010101010111111111111111000010101010100000";
 
 	Algorithm algie(binary, pd);
+
+	PersonalData* apd = algie.getPD();
+
+	cout << apd->first_name << " " << apd->last_name << endl
+			<< apd->birthday << endl
+			<< apd->social_security << endl
+			<< apd->address << endl
+			<< apd->pcp << endl
+			<< apd->med_history << endl;
+	
+	delete pd;
+
+	system("pause");
 }
