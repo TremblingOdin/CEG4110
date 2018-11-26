@@ -13,6 +13,7 @@ int main() {
 	pd->address = "1234 fake street";
 	pd->birthday = "12/12/1212";
 	pd->first_name = "Jane";
+	pd->gender = "M";
 	pd->last_name = "Doe";
 	pd->med_history = "Death, lyme disease, glutten allergy";
 	pd->pcp = "Dr. Mantis Tobagin";
@@ -31,6 +32,23 @@ int main() {
 			<< apd->pcp << endl
 			<< apd->med_history << endl;
 	
+	std::string holder = algie.hide();
+
+	cout << holder << endl;
+
+	Algorithm algor(holder);
+	algor.find();
+
+	apd = algor.getPD();
+
+	cout << apd->first_name << " " << apd->last_name << endl
+		<< apd->birthday << endl
+		<< apd->social_security << endl
+		<< apd->address << endl
+		<< apd->pcp << endl
+		<< apd->med_history << endl;
+
+
 	delete pd;
 
 	system("pause");

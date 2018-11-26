@@ -17,6 +17,7 @@ struct PersonalData {
 	std::string first_name;
 	std::string last_name;
 	std::string birthday;
+	std::string gender;
 	std::string social_security;
 	std::string address;
 	std::string pcp;
@@ -30,6 +31,9 @@ public:
 
 	//Constructor to accept binary data alongside personal data
 	Algorithm(std::string, PersonalData *);
+
+	//Constructor for when just given a nonbinary string
+	Algorithm(std::string);
 
 	std::string hide();
 	void find();
