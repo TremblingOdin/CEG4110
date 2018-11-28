@@ -40,14 +40,18 @@ public:
 	PersonalData* getPD();
 	std::string getBinary();
 
-	//long is the largest number related data type
-	//No clue how large these will be so need largest possible
-	__int64 systime;
-	__int64 dataSize;
-	__int64 varNumb;
+	int dataSize;
+	int varNumb;
 
 	std::string binaryData;
 
 	//Only accepting First Name, Last Name, Birthday, Social Security, Address, Primary Car Physician, Medical History
 	PersonalData *personalData;
+
+private:
+	void cleanup();
+
+	void checkFormat(std::string);
+	void checkFormat(PersonalData*);
+	PersonalData *getFakePD();
 };

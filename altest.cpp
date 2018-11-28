@@ -15,11 +15,11 @@ int main() {
 	pd->first_name = "Jane";
 	pd->gender = "M";
 	pd->last_name = "Doe";
-	pd->med_history = "Death, lyme disease, glutten allergy";
-	pd->pcp = "Dr. Mantis Tobagin";
-	pd->social_security = "555-55-5555";
+	pd->med_history = "Death";
+	pd->pcp = "Tobagin";
+	pd->social_security = "555555555";
 
-	std::string binary = "01010101010111111111111111000010101010100000";
+	std::string binary = "01";
 
 	Algorithm algie(binary, pd);
 
